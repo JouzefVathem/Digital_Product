@@ -1,0 +1,10 @@
+# Django
+Django==4.2
+djangorestframework==3.14.0
+
+# Photo & Image
+Pillow==10.0.0
+
+# Database
+psycopg2==2.9.7
+psycopg2-binary==2.9.7
