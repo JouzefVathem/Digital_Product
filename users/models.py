@@ -1,4 +1,5 @@
 import random
+import uuid
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -163,7 +164,7 @@ class Device(models.Model):
     )
 
     user = models.ForeignKey(User, related_name='devices', on_delete=models.CASCADE)
-    device_uuid = models.UUIDField(_('Device UUID'), null=True)
+    device_uuid = models.UUIDField(_('Device UUID'), default=uuid.uuid4)
     last_login = models.DateTimeField(_('last login date'), null=True)
     device_type = models.PositiveSmallIntegerField(choices=DEVICE_TYPE_CHOICES, default=WEB)
     device_os = models.CharField(_('device os'), max_length=20, blank=True)
@@ -176,6 +177,11 @@ class Device(models.Model):
         verbose_name = _('device')
         verbose_name_plural = _('devices')
         unique_together = ('user', 'device_uuid')
+
+    def save(self, *args, **kwargs):
+        if not self.device_uuid:
+            self.device_uuid = uuid.uuid4()
+        super().save(*args, **kwargs)
 
     
 class Province(models.Model):
