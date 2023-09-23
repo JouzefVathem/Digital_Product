@@ -24,6 +24,7 @@ from .settings import IS_DEVEL
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('products.urls')),
+    path('', include('users.urls')),
 ]
 
 if IS_DEVEL:

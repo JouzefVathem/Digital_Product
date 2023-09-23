@@ -50,7 +50,7 @@ class MyUserAdmin(UserAdmin):
         return queryset, may_have_duplicates
     
 admin.site.unregister(Group)
-admin.site.register(Province)
+admin.site.register(Province, ProvinceAdminInline)
 admin.site.register(User, MyUserAdmin)
 # admin.site.register(Site)
 
