@@ -2,11 +2,14 @@ from rest_framework import serializers
 
 from .models import Category, Product, File
 
+
 class CategorySerializer(serializers.ModelSerializer):
     parent = serializers.SlugRelatedField(queryset=Category.objects.all(), slug_field='title')
+
     class Meta:
         model = Category
         fields = ('id', 'parent', 'title', 'description', 'avatar', 'url')
+
 
 class FileSerializer(serializers.ModelSerializer):
     file_type = serializers.SerializerMethodField()
@@ -17,6 +20,7 @@ class FileSerializer(serializers.ModelSerializer):
 
     def get_file_type(self, obj):
         return obj.get_file_type_display()
+
 
 class ProductSerializer(serializers.HyperlinkedModelSerializer):
     categories = CategorySerializer(many=True)
