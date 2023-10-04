@@ -13,6 +13,7 @@ class Package(models.Model):
     avatar = models.ImageField(_("avatar"), upload_to="packages/", blank=True)
     is_enable = models.BooleanField(_("is enable"), default=True)
     price = models.PositiveIntegerField(_("price"))
+    # gateways = models.ManyToManyField('payments.Gateway')
     duration = models.DurationField(_("duration"), blank=True, null=True)
     created_time = models.DateTimeField(_("created time"), auto_now_add=True)
     updated_time = models.DateTimeField(_("updated time"), auto_now=True)
