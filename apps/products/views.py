@@ -2,10 +2,9 @@ from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
-from subscriptions.models import Subscription
+from apps.subscriptions.models import Subscription
 from .models import Category, Product, File
 from .serializers import CategorySerializer, ProductSerializer, FileSerializer
 
@@ -88,8 +87,8 @@ class ProductDetailView(APIView):
 
     def get(self, request, pk):
         if not Subscription.objects.filter(
-            user=request.user,
-            expire_time__gt=timezone.now()
+                user=request.user,
+                expire_time__gt=timezone.now()
         ).exists():
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
@@ -99,8 +98,8 @@ class ProductDetailView(APIView):
 
     def put(self, request, pk):
         if not Subscription.objects.filter(
-            user=request.user,
-            expire_time__gt=timezone.now()
+                user=request.user,
+                expire_time__gt=timezone.now()
         ).exists():
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
@@ -113,8 +112,8 @@ class ProductDetailView(APIView):
 
     def delete(self, request, pk):
         if not Subscription.objects.filter(
-            user=request.user,
-            expire_time__gt=timezone.now()
+                user=request.user,
+                expire_time__gt=timezone.now()
         ).exists():
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
