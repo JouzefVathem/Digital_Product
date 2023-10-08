@@ -7,5 +7,3 @@ class GatewaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Gateway
         fields = ('id ', 'title', 'description', 'avatar')
-
-
