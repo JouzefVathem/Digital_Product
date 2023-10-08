@@ -3,8 +3,9 @@
 from django.conf import settings
 import django.core.validators
 from django.db import migrations, models
+import django.db.models.deletion
 import django.utils.timezone
-import apps.users.models
+import users.models
 
 
 class Migration(migrations.Migration):
@@ -41,7 +42,7 @@ class Migration(migrations.Migration):
                 'db_table': 'users',
             },
             managers=[
-                ('objects', apps.users.models.UserManager()),
+                ('objects', users.models.UserManager()),
             ],
         ),
         migrations.CreateModel(
