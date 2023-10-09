@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+
 class Category(models.Model):
     parent = models.ForeignKey('self', verbose_name=_('parent'), blank=True, null=True, on_delete=models.CASCADE)
     title = models.CharField(_('Name'), max_length=50)
@@ -17,7 +18,6 @@ class Category(models.Model):
 
     def __str__(self):
         return self.title
-
 
 
 class Product(models.Model):
@@ -37,6 +37,7 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
+
 class File(models.Model):
     FILE_AUDIO = 1
     FILE_VIDEO = 2
@@ -46,7 +47,7 @@ class File(models.Model):
         (FILE_VIDEO, _('Video')),
         (FILE_PDF, _('PDF')),
     )
-    
+
     product = models.ForeignKey('Product', verbose_name=_('product'), related_name='files', on_delete=models.CASCADE)
     title = models.CharField(_('title'), max_length=50)
     file_type = models.PositiveSmallIntegerField(_('file type'), choices=FILE_TYPES)
