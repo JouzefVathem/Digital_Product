@@ -11,6 +11,7 @@ from .views import (
     RegisterView, GetTokenView
 )
 
+
 # router = DefaultRouter()
 # router.register(r'register', RegisterView, basename='register')
 # router.register(r'get-token', GetTokenView, basename='get-token')

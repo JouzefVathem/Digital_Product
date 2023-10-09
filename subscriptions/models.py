@@ -1,13 +1,14 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from users.models import User
 from utils.validators import validate_sku
 
 
 class Package(models.Model):
     title = models.CharField(_("title"), max_length=50)
     sku = models.CharField(_("stock keeping unit"), max_length=20,
-                           help_text=_("Unique identifier for the package"), validators=[validate_sku], db_index=True)
+                           help_text=_("Unique identifier for the package"),validators=[validate_sku], db_index=True)
     description = models.TextField(_("description"), blank=True)
     avatar = models.ImageField(_("avatar"), upload_to="packages/", blank=True)
     is_enable = models.BooleanField(_("is enable"), default=True)

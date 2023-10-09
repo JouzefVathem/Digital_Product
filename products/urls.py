@@ -3,8 +3,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from .views import (
-    ProductListView, ProductDetailView,
-    CategoryListView, CategoryDetailView,
+    ProductListView, ProductDetailView, 
+    CategoryListView, CategoryDetailView, 
     FileListView, FileDetailView
 )
 
