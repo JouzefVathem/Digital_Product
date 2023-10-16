@@ -1,6 +1,8 @@
 .venv/
 .idea/
 
+.env
+
 media/
 local_settings.py
 
