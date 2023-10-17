@@ -7,7 +7,7 @@ from utils.validators import validate_sku
 class Package(models.Model):
     title = models.CharField(_("title"), max_length=50)
     sku = models.CharField(_("stock keeping unit"), max_length=20,
-                           help_text=_("Unique identifier for the package"),validators=[validate_sku], db_index=True)
+                           help_text=_("Unique identifier for the package"), validators=[validate_sku], db_index=True)
     description = models.TextField(_("description"), blank=True)
     avatar = models.ImageField(_("avatar"), upload_to="packages/", blank=True)
     is_enable = models.BooleanField(_("is enable"), default=True)
@@ -21,6 +21,16 @@ class Package(models.Model):
         db_table = 'packages'
         verbose_name = _("Package")
         verbose_name_plural = _("Packages")
+
+    @staticmethod
+    def make_enable(queryset):
+        queryset.filter(is_enable=False)
+        queryset.update(is_enable=True)
+
+    @staticmethod
+    def make_disable(queryset):
+        queryset.filter(is_enable=True)
+        queryset.update(is_enable=False)
 
     def __str__(self):
         return self.title

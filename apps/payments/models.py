@@ -18,6 +18,16 @@ class Gateway(models.Model):
         verbose_name = _("Gateway")
         verbose_name_plural = _("Gateways")
 
+    @staticmethod
+    def make_enable(queryset):
+        queryset.filter(is_enable=False)
+        queryset.update(is_enable=True)
+
+    @staticmethod
+    def make_disable(queryset):
+        queryset.filter(is_enable=True)
+        queryset.update(is_enable=False)
+
 
 class Payment(models.Model):
     STATUS_VOID = 0
