@@ -1,12 +1,17 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.safestring import mark_safe
+from django.utils.html import format_html
+
+from thumbnails.fields import ImageField
+from thumbnails.processors import resize, crop
 
 
 class Category(models.Model):
     parent = models.ForeignKey('self', verbose_name=_('parent'), blank=True, null=True, on_delete=models.CASCADE)
     title = models.CharField(_('Name'), max_length=50)
     description = models.TextField(_('description'), blank=True)
-    avatar = models.ImageField(_('avatar'), upload_to='categories/', blank=True)
+    avatar = ImageField(_('avatar'), upload_to='categories/', blank=True)
     is_enable = models.BooleanField(_('is enable'), default=True)
     created_time = models.DateTimeField(_('created time'), auto_now_add=True)
     updated_time = models.DateTimeField(_('updated time'), auto_now=True)
@@ -33,7 +38,7 @@ class Category(models.Model):
 class Product(models.Model):
     title = models.CharField(_('title'), max_length=50)
     description = models.TextField(_('description'), blank=True)
-    avatar = models.ImageField(_('avatar'), upload_to='products/', blank=True)
+    avatar = ImageField(_('avatar'), upload_to='products/', blank=True)
     is_enable = models.BooleanField(_('is enable'), default=True)
     categories = models.ManyToManyField('Category', verbose_name=_('categories'), blank=True)
     created_time = models.DateTimeField(_('created time'), auto_now_add=True)
@@ -43,6 +48,15 @@ class Product(models.Model):
         db_table = 'products'
         verbose_name = _('product')
         verbose_name_plural = _('Products')
+
+    # @property
+    # def photo(self):
+    #     return format_html('<a href={} target="_blank"><img src={} width="50" style="border-radius:2rem" /></a>'
+    #                        .format(self.avatar.thumbnails.small.url, self.avatar.thumbnails.small.url))
+
+    @property
+    def photo(self):
+        return format_html(f'<a href={self.avatar.thumbnails.small.url} target="_blank"><img src={self.avatar.thumbnails.small.url} width="50" style="border-radius:2rem" /></a>')
 
     @staticmethod
     def make_enable(queryset):
