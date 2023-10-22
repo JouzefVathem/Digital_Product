@@ -4,14 +4,12 @@
 .env
 
 media/
+static/
+logs/
+
 local_settings.py
-
-
-**/__pycache__/
-*.pyc
 
 db.sqlite3
 
-static/
-
-Makefile
+**/__pycache__/
+*.pyc

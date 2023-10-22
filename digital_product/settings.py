@@ -128,8 +128,8 @@ THUMBNAILS = {
     'SIZES': {
         'small': {
             'PROCESSORS': [
-                {'PATH': 'thumbnails.processors.resize', 'width': 10, 'height': 10},
-                {'PATH': 'thumbnails.processors.crop', 'width': 80, 'height': 80}
+                {'PATH': 'thumbnails.processors.resize', 'width': 64, 'height': 80},
+                {'PATH': 'thumbnails.processors.crop', 'width': 64, 'height': 80}
             ],
             'POST_PROCESSORS': [
                 {
@@ -215,4 +215,28 @@ CACHES = {
     }
 }
 
-
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/django.log',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
