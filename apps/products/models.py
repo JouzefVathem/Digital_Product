@@ -25,13 +25,11 @@ class Category(models.Model):
 
     @staticmethod
     def make_enable(queryset):
-        queryset.filter(is_enable=False)
-        queryset.update(is_enable=True)
+        queryset.filter(is_enable=False).update(is_enable=True)
 
     @staticmethod
     def make_disable(queryset):
-        queryset.filter(is_enable=True)
-        queryset.update(is_enable=False)
+        queryset.filter(is_enable=True).update(is_enable=False)
 
     def __str__(self):
         return self.title
@@ -52,11 +50,6 @@ class Product(models.Model):
         verbose_name_plural = _('Products')
 
     # @property
-    # def photo(self):
-    #     return format_html('<a href={} target="_blank"><img src={} width="50" style="border-radius:2rem" /></a>'
-    #                        .format(self.avatar.thumbnails.small.url, self.avatar.thumbnails.small.url))
-
-    # @property
     @admin.display(description='avatar')
     def photo(self):
         the_small_url = self.avatar.thumbnails.small.url
@@ -72,13 +65,11 @@ class Product(models.Model):
 
     @staticmethod
     def make_enable(queryset):
-        queryset.filter(is_enable=False)
-        queryset.update(is_enable=True)
+        queryset.filter(is_enable=False).update(is_enable=True)
 
     @staticmethod
     def make_disable(queryset):
-        queryset.filter(is_enable=True)
-        queryset.update(is_enable=False)
+        queryset.filter(is_enable=True).update(is_enable=False)
 
     def __str__(self):
         return self.title
