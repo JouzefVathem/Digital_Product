@@ -1,10 +1,12 @@
+import logging
+
 from django.db import models
+from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 
 from thumbnails.fields import ImageField
-from thumbnails.processors import resize, crop
 
 
 class Category(models.Model):
@@ -38,7 +40,7 @@ class Category(models.Model):
 class Product(models.Model):
     title = models.CharField(_('title'), max_length=50)
     description = models.TextField(_('description'), blank=True)
-    avatar = ImageField(_('avatar'), upload_to='products/', blank=True)
+    avatar = ImageField(_('avatar'), upload_to='products/', blank=True, null=True, pregenerated_sizes=['small'])
     is_enable = models.BooleanField(_('is enable'), default=True)
     categories = models.ManyToManyField('Category', verbose_name=_('categories'), blank=True)
     created_time = models.DateTimeField(_('created time'), auto_now_add=True)
@@ -54,9 +56,19 @@ class Product(models.Model):
     #     return format_html('<a href={} target="_blank"><img src={} width="50" style="border-radius:2rem" /></a>'
     #                        .format(self.avatar.thumbnails.small.url, self.avatar.thumbnails.small.url))
 
-    @property
+    # @property
+    @admin.display(description='avatar')
     def photo(self):
-        return format_html(f'<a href={self.avatar.thumbnails.small.url} target="_blank"><img src={self.avatar.thumbnails.small.url} width="50" style="border-radius:2rem" /></a>')
+        the_small_url = self.avatar.thumbnails.small.url
+        # logger = logging.getLogger('avatar thumbnails small url')
+        # handler = logging.StreamHandler()
+        # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        # handler.setFormatter(formatter)
+        # logger.addHandler(handler)
+        # logger.info(self.avatar.thumbnails.small.url)
+        return format_html(
+            f'<a href="{self.avatar.url}" target="_blank"> '
+            f'<img src="{the_small_url}" width=50 style="border-radius:2rem; object-fit:contain"/> </a>')
 
     @staticmethod
     def make_enable(queryset):

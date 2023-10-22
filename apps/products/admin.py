@@ -33,7 +33,7 @@ class FileInlineAdmin(admin.StackedInline):
 
 @admin.register(Product)
 class ProductAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('title', 'avatar', 'photo', 'is_enable', 'created_time')
+    list_display = ('title', 'photo', 'is_enable', 'created_time')
     list_filter = ('is_enable',)
     search_fields = ('title',)
     filter_horizontal = ('categories',)
