@@ -22,7 +22,10 @@ from django.conf.urls.static import static
 from .settings import IS_DEVEL
 
 urlpatterns = [
+    path("__debug__/", include('debug_toolbar.urls')),
+
     path('admin/', admin.site.urls),
+
     path('', include('apps.products.urls')),
     path('', include('apps.users.urls')),
     path('subs/', include('apps.subscriptions.urls')),
