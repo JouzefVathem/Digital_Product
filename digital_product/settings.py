@@ -11,16 +11,21 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
-IS_DEVEL = config('DEBUG', default=False, cast=bool)
+IS_DEVEL = config('IS_DEVEL', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+
+# DEBUG TOOLBAR
+INTERNAL_IPS = (
+    config('INTERNAL_IPS'),
+)
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -35,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'import_export',
     'thumbnails',
+    'debug_toolbar',
 
     'apps.users',
     'apps.products',
@@ -50,6 +56,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'digital_product.urls'
@@ -100,13 +108,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Tehran'
 USE_I18N = True
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
