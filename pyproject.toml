@@ -18,6 +18,7 @@ requests = "^2.31.0"
 django-import-export = "^3.3.1"
 python-decouple = "^3.8"
 django-thumbnails = "^0.7.0"
+django-debug-toolbar = "^4.2.0"
 
 
 [build-system]
