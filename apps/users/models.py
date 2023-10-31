@@ -108,6 +108,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         return self.first_name
 
+    def get_active_users(self):
+        """
+        Returns all users that are active.
+        """
+        return self.objects.filter(is_active=True)
+
     def email_user(self, subject, message, from_email=None, **kwargs):
         """
         Sends an email to this User.
