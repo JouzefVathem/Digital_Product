@@ -8,6 +8,8 @@ from django.utils.html import format_html
 
 from thumbnails.fields import ImageField
 
+from apps.users.models import User
+
 
 class Category(models.Model):
     parent = models.ForeignKey('self', verbose_name=_('parent'), blank=True, null=True, on_delete=models.CASCADE)
@@ -38,6 +40,7 @@ class Category(models.Model):
 class Product(models.Model):
     title = models.CharField(_('title'), max_length=50)
     description = models.TextField(_('description'), blank=True)
+    user = models.ForeignKey(User, verbose_name=_('user'), blank=True, null=True, on_delete=models.CASCADE)
     avatar = ImageField(_('avatar'), upload_to='products/', blank=True, null=True, pregenerated_sizes=['small'])
     is_enable = models.BooleanField(_('is enable'), default=True)
     categories = models.ManyToManyField('Category', verbose_name=_('categories'), blank=True)
