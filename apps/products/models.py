@@ -58,11 +58,19 @@ class Product(models.Model):
         Returns the active users products
         """
         active_users_set = set()
+        active_users_products_set = dict()
         activists = User.get_active_users()
         for activist in activists:
             active_users_set.add(activist.id)
-        active_users_products = cls.objects.filter(user__product__in=active_users_set)
-        return active_users_products
+
+        # logger = logging.getLogger('Active users products set')
+        # handler = logging.StreamHandler()
+        # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        # handler.setFormatter(formatter)
+        # logger.addHandler(handler)
+        # logger.info(cls.objects.filter(user_id__in=active_users_set))
+
+        return cls.objects.filter(user_id__in=active_users_set)
 
     # @property
     @admin.display(description='avatar')
