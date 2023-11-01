@@ -4,8 +4,9 @@ import uuid
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core import validators
-from django .utils import timezone
+from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager, send_mail
+
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -18,9 +19,9 @@ class UserManager(BaseUserManager):
         if not username:
             raise ValueError('The given username must be set')
         email = self.normalize_email(email)
-        user = self.model(phone_number=phone_number, username=username, 
-                          email=email, is_staff=is_staff, is_active=True, 
-                          is_superuser=is_superuser, last_login=now, 
+        user = self.model(phone_number=phone_number, username=username,
+                          email=email, is_staff=is_staff, is_active=True,
+                          is_superuser=is_superuser, last_login=now,
                           date_joined=now, **extra_fields)
         if not extra_fields.get('no_password'):
             user.set_password(password)
@@ -35,16 +36,15 @@ class UserManager(BaseUserManager):
             if phone_number:
                 username = random.choice('abcdefghijklmnopqrstuvwxyz') + str(phone_number)[-7:]
             while User.objects.filter(username=username).exists():
-                username += str(random.randint(10,99))
+                username += str(random.randint(10, 99))
 
         return self._create_user(username, phone_number, email, password, False, False, **extra_fields)
 
     def create_superuser(self, username, phone_number, email, password, **extra_fields):
         return self._create_user(username, phone_number, email, password, True, True, **extra_fields)
-    
-    def get_by_phone_number (self, phone_number):
-        return self.get(**{'phone_number': phone_number})
 
+    def get_by_phone_number(self, phone_number):
+        return self.get(**{'phone_number': phone_number})
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -53,32 +53,32 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     Usernamem Password and email are required. Other fields are optional.
     """
-    username = models.CharField(_('username'), max_length=32, unique=True, 
+    username = models.CharField(_('username'), max_length=32, unique=True,
                                 help_text=
-                                _('Required. 32 characters or fewer starting with a letter. Letters, digits and @/./+/-/_ only.'), 
+                                _('Required. 32 characters or fewer starting with a letter. Letters, digits and @/./+/-/_ only.'),
                                 validators=[
                                     validators.RegexValidator(r'^[a-zA-Z][a-zA-Z0-9_\.]+$',
                                                               _('Enter a valid username. This value must contain only letters, numbers and @/./+/-/_ characters.'),
                                                               'invalid'),
-                                ], 
-                                error_messages= {
+                                ],
+                                error_messages={
                                     'unique': _("A user with this username already exists."),
                                 }
                                 )
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
     email = models.EmailField(_('email address'), unique=True, null=True, blank=True)
-    phone_number = models.BigIntegerField(_('phone number'), unique=True, null=True, blank=True, 
-                                            validators=[
-                                                validators.RegexValidator(r'^989[0-3,9]\d{8}$',
-                                                                            ('Enter a valid mobile number.'), 'invalid'),
-                                            ],
-                                            error_messages={
-                                                'unique': _("A user with this phone number already exists."),
-                                            }
-                                            )
+    phone_number = models.BigIntegerField(_('phone number'), unique=True, null=True, blank=True,
+                                          validators=[
+                                              validators.RegexValidator(r'^989[0-3,9]\d{8}$',
+                                                                        ('Enter a valid mobile number.'), 'invalid'),
+                                          ],
+                                          error_messages={
+                                              'unique': _("A user with this phone number already exists."),
+                                          }
+                                          )
     is_staff = models.BooleanField(_('staff status'), default=False,
-                                    help_text=_('Designates whether the user can log into this admin site.'))
+                                   help_text=_('Designates whether the user can log into this admin site.'))
     is_active = models.BooleanField(_('active'), default=True,
                                     help_text=_('Designates whether this user should be treated as active. '
                                                 'Unselect this instead of deleting accounts.'))
@@ -108,11 +108,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         return self.first_name
 
-    def get_active_users(self):
+    @classmethod
+    def get_active_users(cls):
         """
         Returns all users that are active.
         """
-        return self.objects.filter(is_active=True)
+        return cls.objects.filter(is_active=True)
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         """
@@ -126,8 +127,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         Returns True if has actually logged in with valid credentials.
         """
         return self.phone_number is not None or self.email is not None
-    
-    def save (self, *args, **kwargs):
+
+    def save(self, *args, **kwargs):
         if self.email is not None and self.email.strip() == "":
             self.email = None
         super().save(*args, **kwargs)
@@ -138,25 +139,26 @@ class UserProfile(models.Model):
     nick_name = models.CharField(_('nick name'), max_length=150, blank=True)
     avatar = models.ImageField(_('avatar'), upload_to='user_avatar/', blank=True)
     birthday = models.DateField(_('birthday'), null=True, blank=True)
-    gender = models.BooleanField(_('gender'), help_text=_('female is False, male is True, null is unset'), null=True, blank=True)
-    province = models.ForeignKey(verbose_name=_('province'), to='Province', null=True, on_delete=models.SET_NULL, blank=True)
-    
-    class Meta :
+    gender = models.BooleanField(_('gender'), help_text=_('female is False, male is True, null is unset'), null=True,
+                                 blank=True)
+    province = models.ForeignKey(verbose_name=_('province'), to='Province', null=True, on_delete=models.SET_NULL,
+                                 blank=True)
+
+    class Meta:
         db_table = 'user_profiles'
         verbose_name = _('profile')
         verbose_name_plural = _('profiles')
 
     @property
-    def get_first_name (self):
+    def get_first_name(self):
         return self.user.first_name
-    
-    @property
-    def get_last_name (self):
-        return self.user.last_name
-    
-    def get_nickname (self):
-        return self.nick_name if self.nick_name else self.user.username
 
+    @property
+    def get_last_name(self):
+        return self.user.last_name
+
+    def get_nickname(self):
+        return self.nick_name if self.nick_name else self.user.username
 
 
 class Device(models.Model):
@@ -178,7 +180,7 @@ class Device(models.Model):
     app_version = models.CharField(_('app version'), max_length=20, blank=True)
     created_time = models.DateTimeField(auto_now_add=True)
 
-    class Meta: 
+    class Meta:
         db_table = 'user_devices'
         verbose_name = _('device')
         verbose_name_plural = _('devices')
@@ -189,7 +191,7 @@ class Device(models.Model):
             self.device_uuid = uuid.uuid4()
         super().save(*args, **kwargs)
 
-    
+
 class Province(models.Model):
     name = models.CharField(max_length=50)
     is_valid = models.BooleanField(default=True)
@@ -198,4 +200,3 @@ class Province(models.Model):
 
     def __str__(self):
         return self.name
-    
