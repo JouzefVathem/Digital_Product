@@ -52,6 +52,18 @@ class Product(models.Model):
         verbose_name = _('product')
         verbose_name_plural = _('Products')
 
+    @classmethod
+    def get_active_users_products(cls):
+        """
+        Returns the active users products
+        """
+        active_users_set = set()
+        activists = User.get_active_users()
+        for activist in activists:
+            active_users_set.add(activist.id)
+        active_users_products = cls.objects.filter(user__product__in=active_users_set)
+        return active_users_products
+
     # @property
     @admin.display(description='avatar')
     def photo(self):
