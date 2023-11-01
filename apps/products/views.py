@@ -1,7 +1,12 @@
 from django.utils import timezone
+
 from rest_framework.views import APIView
+
+from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
+
+from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 from apps.subscriptions.models import Subscription
@@ -9,10 +14,9 @@ from .models import Category, Product, File
 from .serializers import CategorySerializer, ProductSerializer, FileSerializer
 
 
-# class ProductListView (viewsets.ModelViewSet):
-#     queryset = Product.objects.all()
-#     serializer_class = ProductSerializer
-#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+class ActiveProductList(viewsets.ReadOnlyModelViewSet):
+    queryset = Product.get_active_users_products()
+    serializer_class = ProductSerializer
 
 
 class CategoryListView(APIView):
@@ -87,8 +91,8 @@ class ProductDetailView(APIView):
 
     def get(self, request, pk):
         if not Subscription.objects.filter(
-            user=request.user,
-            expire_time__gt=timezone.now()
+                user=request.user,
+                expire_time__gt=timezone.now()
         ).exists():
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
@@ -98,8 +102,8 @@ class ProductDetailView(APIView):
 
     def put(self, request, pk):
         if not Subscription.objects.filter(
-            user=request.user,
-            expire_time__gt=timezone.now()
+                user=request.user,
+                expire_time__gt=timezone.now()
         ).exists():
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
@@ -112,8 +116,8 @@ class ProductDetailView(APIView):
 
     def delete(self, request, pk):
         if not Subscription.objects.filter(
-            user=request.user,
-            expire_time__gt=timezone.now()
+                user=request.user,
+                expire_time__gt=timezone.now()
         ).exists():
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
