@@ -29,14 +29,13 @@ class Gateway(models.Model):
             original_url = self.avatar.url
 
             return format_html(
-                f'<a href="{original_url}" target="_blank"> '
-                f'<img src="{small_url}" width=50 style="border-radius:2rem; object-fit:contain"/> </a>')
+                f'<a href="{original_url}" target="_blank"> <img src="{small_url}" width=50 style="border-radius:50%; '
+                f'border: 3px solid gray; padding: 5px"/> </a>')
 
         except ValueError:
             return format_html(
-                '<strong style="color: white-smoke;padding: 10px; border-top-left-radius: 20px; '
-                'border-bottom-right-radius: 20px; border-top-right-radius: 10px; border-bottom-left-radius: '
-                '10px; background-color: #B31312">avatar not Found !!!</strong>')
+                '<strong style="color: whitesmoke; padding: 5px; border-radius: 5px; '
+                'background-color: #990100b5">⚠️ avatar not Found !!! </strong>')
 
     @staticmethod
     def make_enable(queryset):
