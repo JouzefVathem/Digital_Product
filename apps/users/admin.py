@@ -6,26 +6,37 @@ from django.utils.translation import gettext_lazy as _
 from .models import User, Province, UserProfile, Device
 
 
+@admin.register(Province)
 class ProvinceAdminInline(admin.ModelAdmin):
     model = Province
-    fields = ['name']
+    list_display = ('id', 'name', 'is_valid')
+    ordering = ('name',)
+    fields = ('name', 'is_valid')
     extra = 0
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    model = UserProfile
+    list_display = ('id', 'nick_name', 'display_avatar', 'gender')
+    ordering = ('id',)
 
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
-    fields = ['nick_name', 'avatar', 'birthday', 'gender']
+    fields = ('nick_name', 'avatar', 'birthday', 'gender')
     verbose_name_plural = 'User Profile'
-    inlines = [ProvinceAdminInline]
+    inlines = (ProvinceAdminInline,)
 
 
 class DeviceInline(admin.StackedInline):
     model = Device
-    fields = ['device_uuid', 'last_login', 'device_type', 'device_os', 'device_model', 'app_version']
+    fields = ('device_uuid', 'last_login', 'device_type', 'device_os', 'device_model', 'app_version')
     verbose_name_plural = 'Device'
     extra = 0
 
 
+@admin.register(User)
 class MyUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
@@ -38,10 +49,10 @@ class MyUserAdmin(UserAdmin):
                 'fields': ('username', 'phone_number', 'password1', 'password2'),
                 }),
     )
-    list_display = ('username', 'phone_number', 'email', 'is_staff', 'is_active')
+    list_display = ('id', 'username', 'phone_number', 'email', 'is_staff', 'is_active')
     search_fields = ('username__exact',)
-    ordering = ('-id',)
-    inlines = [UserProfileInline, DeviceInline]
+    ordering = ('id',)
+    inlines = (UserProfileInline, DeviceInline)
 
     def get_search_results(self, request, queryset, search_term):
         queryset, may_have_duplicates = super().get_search_results(request, queryset, search_term)
@@ -55,6 +66,3 @@ class MyUserAdmin(UserAdmin):
 
 
 admin.site.unregister(Group)
-admin.site.register(Province, ProvinceAdminInline)
-admin.site.register(User, MyUserAdmin)
-# admin.site.register(Site)
