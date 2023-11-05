@@ -90,4 +90,3 @@ class ProductAdmin(ImportExportModelAdmin, admin.ModelAdmin):
         #                          f'{query_count - disabled_count} of the selected products is already disable.')
         #
         #     Product.make_disable(queryset)
-
