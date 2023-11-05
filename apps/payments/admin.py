@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib import messages
 
 from .models import Gateway, Payment
 
@@ -8,17 +9,25 @@ class GatewayAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'display_avatar', 'is_enable', 'updated_time')
     actions = ('make_enable', 'make_disable')
     ordering = ('id',)
-    verbose_name_plural = 'Gateway'
+    verbose_name_plural = 'Gateways'
 
+    @admin.action(description='Enable selected Gateways')
     def make_enable(self, request, queryset):
-        Gateway.make_enable(queryset)
+        enabled_count = len(queryset.filter(is_enable=False))
+        if enabled_count != 0:
+            messages.add_message(request, messages.SUCCESS,
+                                 f'{enabled_count} of the disable Gateways enabled.')
 
-    make_enable.short_description = "Enable selected Gateways"
+            Gateway.make_enable(queryset)
 
+    @admin.action(description='Disable selected Gateways')
     def make_disable(self, request, queryset):
-        Gateway.make_disable(queryset)
+        disabled_count = len(queryset.filter(is_enable=True))
+        if disabled_count != 0:
+            messages.add_message(request, messages.SUCCESS,
+                                 f'{disabled_count} of the enable Gateways disabled.')
 
-    make_disable.short_description = "Disable selected Gateways"
+            Gateway.make_disable(queryset)
 
 
 @admin.register(Payment)
@@ -28,4 +37,4 @@ class PaymentAdmin(admin.ModelAdmin):
     list_filter = ('status', 'gateway', 'package')
     search_fields = ('user_username', 'phone_number')
     ordering = ('id',)
-    verbose_name_plural = 'Payment'
+    verbose_name_plural = 'Payments'
