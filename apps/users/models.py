@@ -5,7 +5,10 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core import validators
 from django.utils import timezone
+from django.utils.html import format_html
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager, send_mail
+
+from thumbnails.fields import ImageField
 
 
 class UserManager(BaseUserManager):
@@ -68,7 +71,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
     email = models.EmailField(_('email address'), unique=True, null=True, blank=True)
-    phone_number = models.BigIntegerField(_('phone number'), unique=True, null=True, blank=True,
+    phone_number = models.BigIntegerField(_('phone number'), null=True, blank=True, unique=True,
                                           validators=[
                                               validators.RegexValidator(r'^989[0-3,9]\d{8}$',
                                                                         ('Enter a valid mobile number.'), 'invalid'),
@@ -88,7 +91,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'phone_number']
+    REQUIRED_FIELDS = ['email']
 
     class Meta:
         db_table = 'users'
@@ -137,7 +140,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     nick_name = models.CharField(_('nick name'), max_length=150, blank=True)
-    avatar = models.ImageField(_('avatar'), upload_to='user_avatar/', blank=True)
+    avatar = ImageField(_('avatar'), upload_to='UserProfile/', blank=True, null=True, pregenerated_sizes=['small'])
     birthday = models.DateField(_('birthday'), null=True, blank=True)
     gender = models.BooleanField(_('gender'), help_text=_('female is False, male is True, null is unset'), null=True,
                                  blank=True)
@@ -148,6 +151,22 @@ class UserProfile(models.Model):
         db_table = 'user_profiles'
         verbose_name = _('profile')
         verbose_name_plural = _('profiles')
+
+    @property
+    def display_avatar(self):
+        try:
+            small_url = self.avatar.thumbnails.small.url
+            original_url = self.avatar.url
+
+            return format_html(
+                f'<a href="{original_url}" target="_blank"> '
+                f'<img src="{small_url}" width=50 style="border-radius:2rem; object-fit:contain"/> </a>')
+
+        except ValueError:
+            return format_html(
+                '<strong style="color: white-smoke;padding: 10px; border-top-left-radius: 20px; '
+                'border-bottom-right-radius: 20px; border-top-right-radius: 10px; border-bottom-left-radius: '
+                '10px; background-color: #B31312">avatar not Found !!!</strong>')
 
     @property
     def get_first_name(self):
