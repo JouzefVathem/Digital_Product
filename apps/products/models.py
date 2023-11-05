@@ -1,9 +1,6 @@
-import logging
-
 from django.db import models
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 
 from thumbnails.fields import ImageField
@@ -24,6 +21,21 @@ class Category(models.Model):
         db_table = 'categories'
         verbose_name = _('Category')
         verbose_name_plural = _('Categories')
+
+    @admin.display(description='avatar')
+    def photo(self):
+        try:
+            small_url = self.avatar.thumbnails.small.url
+            original_url = self.avatar.url
+
+            return format_html(
+                f'<a href="{original_url}" target="_blank"> <img src="{small_url}" width=50 style="border-radius:50%; '
+                f'border: 3px solid gray; padding: 5px"/> </a>')
+
+        except ValueError:
+            return format_html(
+                '<strong style="color: whitesmoke; padding: 5px; border-radius: 5px; '
+                'background-color: #990100b5">⚠️ avatar not Found !!! </strong>')
 
     @staticmethod
     def make_enable(queryset):
@@ -58,33 +70,26 @@ class Product(models.Model):
         Returns the active users products
         """
         active_users_set = set()
-        active_users_products_set = dict()
         activists = User.get_active_users()
         for activist in activists:
             active_users_set.add(activist.id)
 
-        # logger = logging.getLogger('Active users products set')
-        # handler = logging.StreamHandler()
-        # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        # handler.setFormatter(formatter)
-        # logger.addHandler(handler)
-        # logger.info(cls.objects.filter(user_id__in=active_users_set))
-
         return cls.objects.filter(user_id__in=active_users_set)
 
-    # @property
     @admin.display(description='avatar')
     def photo(self):
-        the_small_url = self.avatar.thumbnails.small.url
-        # logger = logging.getLogger('avatar thumbnails small url')
-        # handler = logging.StreamHandler()
-        # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        # handler.setFormatter(formatter)
-        # logger.addHandler(handler)
-        # logger.info(self.avatar.thumbnails.small.url)
-        return format_html(
-            f'<a href="{self.avatar.url}" target="_blank"> '
-            f'<img src="{the_small_url}" width=50 style="border-radius:2rem; object-fit:contain"/> </a>')
+        try:
+            small_url = self.avatar.thumbnails.small.url
+            original_url = self.avatar.url
+
+            return format_html(
+                f'<a href="{original_url}" target="_blank"> <img src="{small_url}" width=50 style="border-radius:50%; '
+                f'border: 3px solid gray; padding: 5px"/> </a>')
+
+        except ValueError:
+            return format_html(
+                '<strong style="color: whitesmoke; padding: 5px; border-radius: 5px; '
+                'background-color: #990100b5">⚠️ avatar not Found !!! </strong>')
 
     @staticmethod
     def make_enable(queryset):
