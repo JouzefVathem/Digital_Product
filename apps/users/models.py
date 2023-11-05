@@ -7,6 +7,7 @@ from django.core import validators
 from django.utils import timezone
 from django.utils.html import format_html
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager, send_mail
+from django.contrib import admin
 
 from thumbnails.fields import ImageField
 
@@ -91,7 +92,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
+    REQUIRED_FIELDS = ('email',)
 
     class Meta:
         db_table = 'users'
@@ -152,21 +153,20 @@ class UserProfile(models.Model):
         verbose_name = _('profile')
         verbose_name_plural = _('profiles')
 
-    @property
+    @admin.display(description='Avatar')
     def display_avatar(self):
         try:
             small_url = self.avatar.thumbnails.small.url
             original_url = self.avatar.url
 
             return format_html(
-                f'<a href="{original_url}" target="_blank"> '
-                f'<img src="{small_url}" width=50 style="border-radius:2rem; object-fit:contain"/> </a>')
+                f'<a href="{original_url}" target="_blank"> <img src="{small_url}" width=50 style="border-radius:50%; '
+                f'border: 3px solid gray; padding: 5px"/> </a>')
 
         except ValueError:
             return format_html(
-                '<strong style="color: white-smoke;padding: 10px; border-top-left-radius: 20px; '
-                'border-bottom-right-radius: 20px; border-top-right-radius: 10px; border-bottom-left-radius: '
-                '10px; background-color: #B31312">avatar not Found !!!</strong>')
+                '<strong style="color: whitesmoke; padding: 5px; border-radius: 5px; '
+                'background-color: #990100b5">⚠️ avatar not Found !!! </strong>')
 
     @property
     def get_first_name(self):
@@ -178,6 +178,9 @@ class UserProfile(models.Model):
 
     def get_nickname(self):
         return self.nick_name if self.nick_name else self.user.username
+
+    def __str__(self):
+        return self.user.username
 
 
 class Device(models.Model):
@@ -216,6 +219,14 @@ class Province(models.Model):
     is_valid = models.BooleanField(default=True)
     modified_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    @staticmethod
+    def make_valid(queryset):
+        queryset.filter(is_valid=False).update(is_valid=True)
+
+    @staticmethod
+    def make_invalid(queryset):
+        queryset.filter(is_valid=True).update(is_valid=False)
 
     def __str__(self):
         return self.name
