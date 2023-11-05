@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib import messages
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from django.utils.translation import gettext_lazy as _
@@ -9,17 +10,36 @@ from .models import User, Province, UserProfile, Device
 @admin.register(Province)
 class ProvinceAdminInline(admin.ModelAdmin):
     model = Province
-    list_display = ('id', 'name', 'is_valid')
+    list_display = ('id', 'name', 'is_valid', 'modified_at')
     ordering = ('name',)
     fields = ('name', 'is_valid')
+    actions = ('make_valid', 'make_invalid')
     extra = 0
+
+    @admin.action(description='Validate selected Provinces')
+    def make_valid(self, request, queryset):
+        enabled_count = len(queryset.filter(is_valid=False))
+        if enabled_count != 0:
+            messages.add_message(request, messages.SUCCESS,
+                                 f'{enabled_count} of the invalid Provinces made Validated.')
+
+            Province.make_valid(queryset)
+
+    @admin.action(description='Invalidate selected Provinces')
+    def make_invalid(self, request, queryset):
+        disabled_count = len(queryset.filter(is_valid=True))
+        if disabled_count != 0:
+            messages.add_message(request, messages.SUCCESS,
+                                 f'{disabled_count} of the valid Provinces made Invalidated.')
+
+            Province.make_invalid(queryset)
 
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     model = UserProfile
     list_display = ('id', 'nick_name', 'display_avatar', 'gender', 'province')
-    verbose_name_plural = 'User Profile'
+    verbose_name_plural = 'Users Profile'
     ordering = ('id',)
 
 
@@ -50,7 +70,7 @@ class MyUserAdmin(UserAdmin):
                 'fields': ('username', 'phone_number', 'password1', 'password2'),
                 }),
     )
-    list_display = ('id', 'username', 'phone_number', 'email', 'is_staff', 'is_active')
+    list_display = ('id', 'username', 'phone_number', 'email', 'is_staff', 'is_active', 'date_joined', 'last_seen')
     search_fields = ('username__exact',)
     ordering = ('id',)
     inlines = (UserProfileInline, DeviceInline)
