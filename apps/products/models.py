@@ -12,7 +12,7 @@ class Category(models.Model):
     parent = models.ForeignKey('self', verbose_name=_('parent'), blank=True, null=True, on_delete=models.CASCADE)
     title = models.CharField(_('Name'), max_length=50)
     description = models.TextField(_('description'), blank=True)
-    avatar = ImageField(_('avatar'), upload_to='categories/', blank=True)
+    avatar = ImageField(_('avatar'), upload_to='categories/', blank=True, null=True, pregenerated_sizes=['small'])
     is_enable = models.BooleanField(_('is enable'), default=True)
     created_time = models.DateTimeField(_('created time'), auto_now_add=True)
     updated_time = models.DateTimeField(_('updated time'), auto_now=True)
