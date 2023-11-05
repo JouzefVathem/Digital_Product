@@ -18,7 +18,8 @@ class ProvinceAdminInline(admin.ModelAdmin):
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     model = UserProfile
-    list_display = ('id', 'nick_name', 'display_avatar', 'gender')
+    list_display = ('id', 'nick_name', 'display_avatar', 'gender', 'province')
+    verbose_name_plural = 'User Profile'
     ordering = ('id',)
 
 
