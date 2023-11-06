@@ -15,7 +15,7 @@ from thumbnails.fields import ImageField
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
-    def _create_user(self, username, phone_number, email, password, is_staff, is_superuser, **extra_fields):
+    def _create_user(self, username, email, password, is_staff, is_superuser, **extra_fields):
         """
         Creates and saves a User with given username, email and password.
         """
@@ -23,9 +23,8 @@ class UserManager(BaseUserManager):
         if not username:
             raise ValueError('The given username must be set')
         email = self.normalize_email(email)
-        user = self.model(phone_number=phone_number, username=username,
-                          email=email, is_staff=is_staff, is_active=True,
-                          is_superuser=is_superuser, last_login=now,
+        user = self.model(username=username, email=email,
+                          is_staff=is_staff, is_active=True, is_superuser=is_superuser, last_login=now,
                           date_joined=now, **extra_fields)
         if not extra_fields.get('no_password'):
             user.set_password(password)
@@ -33,19 +32,19 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, username=None, phone_number=None, email=None, password=None, **extra_fields):
+    def create_user(self, username=None, email=None, password=None, **extra_fields):
         if username is None:
             if email:
                 username = email.split('@', 1)[0]
-            if phone_number:
-                username = random.choice('abcdefghijklmnopqrstuvwxyz') + str(phone_number)[-7:]
+            # if phone_number:
+            #     username = random.choice('abcdefghijklmnopqrstuvwxyz') + str(phone_number)[-7:]
             while User.objects.filter(username=username).exists():
                 username += str(random.randint(10, 99))
 
-        return self._create_user(username, phone_number, email, password, False, False, **extra_fields)
+        return self._create_user(username, email, password, False, False, **extra_fields)
 
-    def create_superuser(self, username, phone_number, email, password, **extra_fields):
-        return self._create_user(username, phone_number, email, password, True, True, **extra_fields)
+    def create_superuser(self, username, email, password, **extra_fields):
+        return self._create_user(username,  email, password, True, True, **extra_fields)
 
     def get_by_phone_number(self, phone_number):
         return self.get(**{'phone_number': phone_number})
@@ -55,7 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     """
     An abstract base class implementing a fully featured User model with admin-compliant permissions.
 
-    Usernamem Password and email are required. Other fields are optional.
+    Username Password and email are required. Other fields are optional.
     """
     username = models.CharField(_('username'), max_length=32, unique=True,
                                 help_text=
@@ -86,6 +85,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(_('active'), default=True,
                                     help_text=_('Designates whether this user should be treated as active. '
                                                 'Unselect this instead of deleting accounts.'))
+    # avatar = ImageField(_('avatar'), upload_to='User/', blank=True, null=True, pregenerated_sizes=['small'])
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     last_seen = models.DateTimeField(_('last seen date'), null=True)
 
