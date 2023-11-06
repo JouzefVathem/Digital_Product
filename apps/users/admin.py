@@ -12,7 +12,7 @@ class ProvinceAdminInline(admin.ModelAdmin):
     model = Province
     list_display = ('id', 'name', 'is_valid', 'modified_at')
     ordering = ('name',)
-    fields = ('name', 'is_valid')
+    # fields = ('name', 'is_valid')
     actions = ('make_valid', 'make_invalid')
     extra = 0
 
