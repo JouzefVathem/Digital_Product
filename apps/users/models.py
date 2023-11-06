@@ -142,6 +142,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     nick_name = models.CharField(_('nick name'), max_length=150, blank=True)
     avatar = ImageField(_('avatar'), upload_to='UserProfile/', blank=True, null=True, pregenerated_sizes=['small'])
+    bio = models.TextField(_('bio'), blank=True, null=True)
     birthday = models.DateField(_('birthday'), null=True, blank=True)
     gender = models.BooleanField(_('gender'), help_text=_('female is False, male is True, null is unset'), null=True,
                                  blank=True)
