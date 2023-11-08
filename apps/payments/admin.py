@@ -1,14 +1,30 @@
 from django.contrib import admin
 from django.contrib import messages
 
+from django.utils.translation import gettext_lazy as _
+
+from import_export.admin import ImportExportModelAdmin
+
 from .models import Gateway, Payment
 
 
 @admin.register(Gateway)
-class GatewayAdmin(admin.ModelAdmin):
+class GatewayAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    readonly_fields = ('created_time', 'updated_time')
+    fieldsets = (
+        (None, {'classes': ('wide',), 'fields': ('title', 'is_enable')}),
+        (_('Create, Update'), {'classes': ('wide',), 'fields': ('created_time', 'updated_time')}),
+        (_('Optional info'), {'classes': ('wide',), 'fields': ('description', 'avatar')}),
+    )
+    ordering = ('title',)
     list_display = ('id', 'title', 'display_avatar', 'is_enable', 'updated_time')
+    list_display_links = ('id', 'title')
+    list_filter = ('is_enable',)
+    list_per_page = 15
+    search_fields = ('id', 'title')
+    date_hierarchy = 'updated_time'
     actions = ('make_enable', 'make_disable')
-    ordering = ('id',)
+    search_help_text = _('Search by id or title')
     verbose_name_plural = 'Gateways'
 
     @admin.action(description='Enable selected Gateways')
@@ -31,10 +47,21 @@ class GatewayAdmin(admin.ModelAdmin):
 
 
 @admin.register(Payment)
-class PaymentAdmin(admin.ModelAdmin):
+class PaymentAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    readonly_fields = ('created_time', 'updated_time')
+    fieldsets = (
+        (_('Payment Info'), {'classes': ('wide',), 'fields': ('user', 'package', 'gateway')}),
+        (_('Payment Info'), {'classes': ('wide',), 'fields': ('created_time', 'updated_time')}),
+        (_('User Auth'), {'classes': ('wide',), 'fields': ('device_uuid', 'token', 'phone_number', 'consumed_code')}),
+    )
+    ordering = ('-updated_time',)
     list_display = (
-        'id', 'user', 'package', 'gateway', 'price', 'status', 'phone_number', 'created_time', 'updated_time')
+        'id', 'updated_time', 'user', 'package', 'gateway', 'price', 'status', 'phone_number', 'created_time')
+    list_display_links = ('id', 'updated_time')
+    list_select_related = ('user', 'package', 'gateway')
     list_filter = ('status', 'gateway', 'package')
-    search_fields = ('user_username', 'phone_number')
-    ordering = ('id',)
+    list_per_page = 15
+    search_fields = ('id', 'user_username', 'phone_number', 'price')
+    date_hierarchy = 'updated_time'
     verbose_name_plural = 'Payments'
+    search_help_text = _('Search by id, user, phone number or price')
