@@ -22,6 +22,7 @@ class UserManager(BaseUserManager):
         now = timezone.now()
         if not username:
             raise ValueError('The given username must be set')
+        username = str(username).lower()
         email = self.normalize_email(email)
         user = self.model(username=username, email=email,
                           is_staff=is_staff, is_active=True, is_superuser=is_superuser, last_login=now,
@@ -32,19 +33,19 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, username=None, email=None, password=None, **extra_fields):
+    def create_user(self, username=None, email=None, phone_number=None, password=None, **extra_fields):
         if username is None:
             if email:
                 username = email.split('@', 1)[0]
-            # if phone_number:
-            #     username = random.choice('abcdefghijklmnopqrstuvwxyz') + str(phone_number)[-7:]
+            if phone_number:
+                username = random.choice('abcdefghijklmnopqrstuvwxyz') + str(phone_number)[-7:]
             while User.objects.filter(username=username).exists():
                 username += str(random.randint(10, 99))
 
         return self._create_user(username, email, password, False, False, **extra_fields)
 
     def create_superuser(self, username, email, password, **extra_fields):
-        return self._create_user(username,  email, password, True, True, **extra_fields)
+        return self._create_user(username, email, password, True, True, **extra_fields)
 
     def get_by_phone_number(self, phone_number):
         return self.get(**{'phone_number': phone_number})
@@ -56,12 +57,15 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     Username Password and email are required. Other fields are optional.
     """
-    username = models.CharField(_('username'), max_length=32, unique=True,
-                                help_text=
-                                _('Required. 32 characters or fewer starting with a letter. Letters, digits and @/./+/-/_ only.'),
+    username = models.CharField(_('username'), max_length=32, unique=True, help_text=_('Required. 32 characters or '
+                                                                                       'fewer starting with a '
+                                                                                       'Lowercase letter. @/./+/-/_ '
+                                                                                       'only.'),
                                 validators=[
-                                    validators.RegexValidator(r'^[a-zA-Z][a-zA-Z0-9_\.]+$',
-                                                              _('Enter a valid username. This value must contain only letters, numbers and @/./+/-/_ characters.'),
+                                    validators.RegexValidator(r'^[a-z][a-z0-9_\.]+$',
+                                                              _('Enter a valid username. '
+                                                                'This value must contain only Lowercase letter, '
+                                                                'numbers and @/./+/-/_ characters.'),
                                                               'invalid'),
                                 ],
                                 error_messages={
@@ -74,7 +78,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone_number = models.BigIntegerField(_('phone number'), null=True, blank=True, unique=True,
                                           validators=[
                                               validators.RegexValidator(r'^989[0-3,9]\d{8}$',
-                                                                        ('Enter a valid mobile number.'), 'invalid'),
+                                                                        'Enter a valid mobile number.', 'invalid'),
                                           ],
                                           error_messages={
                                               'unique': _("A user with this phone number already exists."),
@@ -85,7 +89,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(_('active'), default=True,
                                     help_text=_('Designates whether this user should be treated as active. '
                                                 'Unselect this instead of deleting accounts.'))
-    # avatar = ImageField(_('avatar'), upload_to='User/', blank=True, null=True, pregenerated_sizes=['small'])
+    avatar = ImageField(_('avatar'), upload_to='User/', blank=True, null=True, pregenerated_sizes=['small'])
+    nick_name = models.CharField(_('nick name'), max_length=150, blank=True)
+    gender = models.BooleanField(_('gender'), help_text=_('female is No, male is Yes, Unknown is unset'), null=True,
+                                 blank=True)
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     last_seen = models.DateTimeField(_('last seen date'), null=True)
 
@@ -98,6 +105,21 @@ class User(AbstractBaseUser, PermissionsMixin):
         db_table = 'users'
         verbose_name = _('user')
         verbose_name_plural = _('users')
+
+    @admin.display(description='avatar')
+    def display_avatar(self):
+        try:
+            original_url = self.avatar.url
+            small_url = self.avatar.thumbnails.small.url
+
+            return format_html(
+                f'<a href="{original_url}" target="_blank"> <img src="{small_url}" width=50 style="border-radius:50%; '
+                f'border: 3px solid gray; padding: 5px"/> </a>')
+
+        except ValueError:
+            return format_html(
+                '<strong style="color: whitesmoke; padding: 5px; border-radius: 5px; '
+                'background-color: #990100b5">⚠️ avatar not set !!! </strong>')
 
     def get_full_name(self):
         """
@@ -126,62 +148,19 @@ class User(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     @property
-    def is_loggedin_user(self):
+    def is_logged_in_user(self):
         """
-        Returns True if has actually logged in with valid credentials.
+        Returns True if it has actually logged in with valid credentials.
         """
         return self.phone_number is not None or self.email is not None
+
+    def get_nickname(self):
+        return self.nick_name if self.nick_name else self.username
 
     def save(self, *args, **kwargs):
         if self.email is not None and self.email.strip() == "":
             self.email = None
         super().save(*args, **kwargs)
-
-
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    nick_name = models.CharField(_('nick name'), max_length=150, blank=True)
-    avatar = ImageField(_('avatar'), upload_to='UserProfile/', blank=True, null=True, pregenerated_sizes=['small'])
-    bio = models.TextField(_('bio'), blank=True, null=True)
-    birthday = models.DateField(_('birthday'), null=True, blank=True)
-    gender = models.BooleanField(_('gender'), help_text=_('female is False, male is True, null is unset'), null=True,
-                                 blank=True)
-    province = models.ForeignKey(verbose_name=_('province'), to='Province', null=True, on_delete=models.SET_NULL,
-                                 blank=True)
-
-    class Meta:
-        db_table = 'user_profiles'
-        verbose_name = _('profile')
-        verbose_name_plural = _('profiles')
-
-    @admin.display(description='Avatar')
-    def display_avatar(self):
-        try:
-            small_url = self.avatar.thumbnails.small.url
-            original_url = self.avatar.url
-
-            return format_html(
-                f'<a href="{original_url}" target="_blank"> <img src="{small_url}" width=50 style="border-radius:50%; '
-                f'border: 3px solid gray; padding: 5px"/> </a>')
-
-        except ValueError:
-            return format_html(
-                '<strong style="color: whitesmoke; padding: 5px; border-radius: 5px; '
-                'background-color: #990100b5">⚠️ avatar not Found !!! </strong>')
-
-    @property
-    def get_first_name(self):
-        return self.user.first_name
-
-    @property
-    def get_last_name(self):
-        return self.user.last_name
-
-    def get_nickname(self):
-        return self.nick_name if self.nick_name else self.user.username
-
-    def __str__(self):
-        return self.user.username
 
 
 class Device(models.Model):
