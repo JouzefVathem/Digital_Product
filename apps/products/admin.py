@@ -1,17 +1,30 @@
 from django.contrib import admin
 from django.contrib import messages
 
+from django.utils.translation import gettext_lazy as _
+
 from import_export.admin import ImportExportModelAdmin
 
 from .models import Category, Product, File
 
 
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'parent', 'title', 'photo', 'is_enable', 'created_time', 'updated_time')
+class CategoryAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    readonly_fields = ('created_time', 'updated_time')
+    fieldsets = (
+        (None, {'classes': ('wide',), 'fields': ('parent', 'title', 'is_enable')}),
+        (_('Create, Update'), {'fields': ('created_time', 'updated_time')}),
+        (_('Optional info'), {'classes': ('wide',), 'fields': ('description', 'avatar')}),
+    )
     ordering = ('id',)
+    list_display = ('id', 'title', 'display_avatar', 'parent', 'is_enable', 'created_time', 'updated_time')
+    list_display_links = ('id', 'title')
+    list_select_related = ('parent',)
     list_filter = ('parent', 'is_enable')
-    search_fields = ('title',)
+    list_per_page = 15
+    search_fields = ('id', 'title', 'parent')
+    search_help_text = _('Search by id, name or parent')
+    date_hierarchy = 'updated_time'
     actions = ('make_enable', 'make_disable')
     verbose_name_plural = 'Categories'
 
@@ -36,19 +49,30 @@ class CategoryAdmin(admin.ModelAdmin):
 
 class FileInlineAdmin(admin.StackedInline):
     model = File
-    fields = ('title', 'file_type', 'file', 'is_enable')
+    fields = ('id', 'title', 'file_type', 'file', 'is_enable')
     extra = 0
 
 
 @admin.register(Product)
 class ProductAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('id', 'title', 'user', 'photo', 'is_enable', 'created_time', 'updated_time')
-    ordering = ('id',)
-    list_filter = ('is_enable',)
-    search_fields = ('title',)
-    filter_horizontal = ('categories',)
+    readonly_fields = ('created_time', 'updated_time')
     inlines = (FileInlineAdmin,)
+    fieldsets = (
+        (None, {'classes': ('wide',), 'fields': ('title', 'user', 'is_enable', 'categories')}),
+        (_('Optional info'), {'classes': ('wide',), 'fields': ('description', 'avatar')}),
+        (_('Important Dates'), {'fields': ('created_time', 'updated_time')}),
+    )
+    filter_horizontal = ('categories',)
+    list_display = ('id', 'title', 'user', 'display_avatar', 'is_enable', 'created_time', 'updated_time')
+    list_display_links = ('id', 'title')
+    list_select_related = ('user',)
+    list_filter = ('is_enable',)
+    list_per_page = 15
+    ordering = ('id',)
+    search_fields = ('id', 'title', 'user')
+    date_hierarchy = 'updated_time'
     actions = ('make_enable', 'make_disable')
+    search_help_text = _('Search by id, title or user')
     verbose_name_plural = 'Products'
 
     @admin.action(description='Enable selected Products')
