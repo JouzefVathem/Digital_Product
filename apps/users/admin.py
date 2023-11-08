@@ -4,17 +4,29 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from django.utils.translation import gettext_lazy as _
 
-from .models import User, Province, UserProfile, Device
+from .models import User, Province, Device
+
+from import_export.admin import ImportExportModelAdmin
 
 
 @admin.register(Province)
-class ProvinceAdminInline(admin.ModelAdmin):
-    model = Province
+class ProvinceAdminInline(ImportExportModelAdmin, admin.ModelAdmin):
+    readonly_fields = ('created_at', 'modified_at')
+    fieldsets = (
+        (_('Province Info'), {'fields': ('name', 'Description', 'is_valid')}),
+        (_('Important Dates'), {'fields': ('created_at', 'modified_at')}),
+    )
     list_display = ('id', 'name', 'is_valid', 'modified_at')
+    list_display_links = ('id', 'name')
+    list_filter = ('is_valid',)
+    list_per_page = 15
     ordering = ('name',)
-    # fields = ('name', 'is_valid')
+    search_fields = ('id', 'name')
+    date_hierarchy = 'modified_at'
     actions = ('make_valid', 'make_invalid')
+    model = Province
     extra = 0
+    search_help_text = _('Search by id or name')
 
     @admin.action(description='Validate selected Provinces')
     def make_valid(self, request, queryset):
@@ -35,45 +47,36 @@ class ProvinceAdminInline(admin.ModelAdmin):
             Province.make_invalid(queryset)
 
 
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    model = UserProfile
-    list_display = ('id', 'nick_name', 'display_avatar', 'gender', 'province')
-    verbose_name_plural = 'Users Profile'
-    ordering = ('id',)
-
-
-class UserProfileInline(admin.StackedInline):
-    model = UserProfile
-    fields = ('nick_name', 'avatar', 'birthday', 'gender')
-    verbose_name_plural = 'User Profile'
-    inlines = (ProvinceAdminInline,)
-
-
 class DeviceInline(admin.StackedInline):
     model = Device
-    fields = ('device_uuid', 'last_login', 'device_type', 'device_os', 'device_model', 'app_version')
-    verbose_name_plural = 'Device'
+    fields = ('device_uuid', 'device_type', 'device_os', 'device_model', 'app_version', 'last_login')
+    verbose_name_plural = 'Devices'
     extra = 0
 
 
 @admin.register(User)
-class MyUserAdmin(UserAdmin):
+class MyUserAdmin(ImportExportModelAdmin, UserAdmin):
+    inlines = (DeviceInline,)
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        (_('Personal info'), {'fields': ('first_name', 'last_name', 'phone_number', 'email')}),
+        (_('Personal Info'), {'fields': (('first_name', 'last_name'), 'gender', 'phone_number', 'email')}),
+        (_('Profile'), {'fields': ('nick_name', 'avatar')}),
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+        (_('Important Dates'), {'fields': ('date_joined', 'last_login')}),
     )
     add_fieldsets = (
-        (None, {'classes': ('wide',),
-                'fields': ('username', 'phone_number', 'password1', 'password2'),
-                }),
+        (None, {'classes': ('wide',), 'fields': ('username', 'phone_number', 'password1', 'password2'), }),
     )
-    list_display = ('id', 'username', 'phone_number', 'email', 'is_staff', 'is_active', 'date_joined', 'last_seen')
-    search_fields = ('username__exact',)
+    list_display = ('id', 'username', 'nick_name', 'gender', 'display_avatar', 'phone_number', 'email',
+                    'is_staff', 'is_active', 'date_joined', 'last_seen')
+    list_display_links = ('id', 'username')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups', 'gender')
+    list_per_page = 15
     ordering = ('id',)
-    inlines = (UserProfileInline, DeviceInline)
+    search_fields = ('id', 'username', 'first_name', 'last_name', 'nick_name', 'phone_number', 'email')
+    date_hierarchy = 'last_login'
+    save_on_top = True
+    search_help_text = _('Search by id, username, nick name, phone number or email')
 
     def get_search_results(self, request, queryset, search_term):
         queryset, may_have_duplicates = super().get_search_results(request, queryset, search_term)
