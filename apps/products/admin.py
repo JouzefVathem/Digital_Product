@@ -14,7 +14,7 @@ class CategoryAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     fieldsets = (
         (None, {'classes': ('wide',), 'fields': ('parent', 'title', 'is_enable')}),
         (_('Create, Update'), {'fields': ('created_time', 'updated_time')}),
-        (_('Optional info'), {'classes': ('wide',), 'fields': ('description', 'avatar')}),
+        (_('Optional Info'), {'classes': ('wide',), 'fields': ('description', 'avatar')}),
     )
     ordering = ('id',)
     list_display = ('id', 'title', 'display_avatar', 'parent', 'is_enable', 'created_time', 'updated_time')
