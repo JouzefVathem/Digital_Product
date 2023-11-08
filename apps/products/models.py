@@ -23,10 +23,10 @@ class Category(models.Model):
         verbose_name_plural = _('Categories')
 
     @admin.display(description='avatar')
-    def photo(self):
+    def display_avatar(self):
         try:
-            small_url = self.avatar.thumbnails.small.url
             original_url = self.avatar.url
+            small_url = self.avatar.thumbnails.small.url
 
             return format_html(
                 f'<a href="{original_url}" target="_blank"> <img src="{small_url}" width=50 style="border-radius:50%; '
@@ -35,7 +35,7 @@ class Category(models.Model):
         except ValueError:
             return format_html(
                 '<strong style="color: whitesmoke; padding: 5px; border-radius: 5px; '
-                'background-color: #990100b5">⚠️ avatar not Found !!! </strong>')
+                'background-color: #990100b5">⚠️ avatar not set !!! </strong>')
 
     @staticmethod
     def make_enable(queryset):
@@ -77,10 +77,10 @@ class Product(models.Model):
         return cls.objects.filter(user_id__in=active_users_set)
 
     @admin.display(description='avatar')
-    def photo(self):
+    def display_avatar(self):
         try:
-            small_url = self.avatar.thumbnails.small.url
             original_url = self.avatar.url
+            small_url = self.avatar.thumbnails.small.url
 
             return format_html(
                 f'<a href="{original_url}" target="_blank"> <img src="{small_url}" width=50 style="border-radius:50%; '
@@ -89,7 +89,7 @@ class Product(models.Model):
         except ValueError:
             return format_html(
                 '<strong style="color: whitesmoke; padding: 5px; border-radius: 5px; '
-                'background-color: #990100b5">⚠️ avatar not Found !!! </strong>')
+                'background-color: #990100b5">⚠️ avatar not set !!! </strong>')
 
     @staticmethod
     def make_enable(queryset):
