@@ -10,7 +10,7 @@ from thumbnails.fields import ImageField
 
 class Gateway(models.Model):
     title = models.CharField(_("title"), max_length=100)
-    description = models.TextField(_("discription"), blank=True)
+    description = models.TextField(_("description"), blank=True)
     avatar = ImageField(_('avatar'), upload_to='gateway/', blank=True, null=True, pregenerated_sizes=['small'])
     is_enable = models.BooleanField(_("is enable"), default=True)
     # credentials = models.JSONFieldField(_("credentials"), blank=True)
@@ -25,8 +25,8 @@ class Gateway(models.Model):
     @admin.display(description='Avatar')
     def display_avatar(self):
         try:
-            small_url = self.avatar.thumbnails.small.url
             original_url = self.avatar.url
+            small_url = self.avatar.thumbnails.small.url
 
             return format_html(
                 f'<a href="{original_url}" target="_blank"> <img src="{small_url}" width=50 style="border-radius:50%; '
@@ -35,7 +35,7 @@ class Gateway(models.Model):
         except ValueError:
             return format_html(
                 '<strong style="color: whitesmoke; padding: 5px; border-radius: 5px; '
-                'background-color: #990100b5">⚠️ avatar not Found !!! </strong>')
+                'background-color: #990100b5">⚠️ avatar not set !!! </strong>')
 
     @staticmethod
     def make_enable(queryset):
