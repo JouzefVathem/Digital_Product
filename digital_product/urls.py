@@ -24,6 +24,8 @@ from .settings import IS_DEVEL
 urlpatterns = [
     path("__debug__/", include('debug_toolbar.urls')),
 
+    path('auth/', include('rest_framework.urls')),
+
     path('admin/', admin.site.urls),
 
     path('', include('apps.products.urls')),
