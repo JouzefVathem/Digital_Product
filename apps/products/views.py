@@ -1,37 +1,35 @@
-from django.utils import timezone
-
-from rest_framework.views import APIView
-
 from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
-from rest_framework import permissions
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-
-from apps.subscriptions.models import Subscription
 from .models import Category, Product, File
 from .serializers import CategorySerializer, ProductSerializer, FileSerializer
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by('-created_time')
     serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class ActiveProductList(viewsets.ReadOnlyModelViewSet):
-    queryset = Product.get_active_users_products()
+    queryset = Product.get_active_users_products().order_by('-created_time')
     serializer_class = ProductSerializer
+    permission_classes = [IsAdminUser]
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by('-created_time')
     serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
 
 
 class FileViewSet(viewsets.ModelViewSet):
-    queryset = File.objects.all()
+    queryset = File.objects.all().order_by('-created_time')
     serializer_class = FileSerializer
+    permission_classes = [IsAuthenticated]
 
 
 # class CategoryListView(APIView):
