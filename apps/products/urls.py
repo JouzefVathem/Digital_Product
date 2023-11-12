@@ -23,5 +23,5 @@ urlpatterns = [
     #
     # path('products/<int:product_id>/files/', FileListView.as_view(), name='file-list'),
     # path('products/<int:product_id>/files/<int:pk>/', FileDetailView.as_view(), name='file-detail'),
-    path('Product/', include(router.urls))
+    path('product/', include(router.urls)),
 ]
