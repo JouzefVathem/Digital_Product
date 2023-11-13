@@ -65,16 +65,16 @@ class Product(models.Model):
         verbose_name_plural = _('Products')
 
     @classmethod
-    def get_active_users_products(cls):
+    def get_active_users_products(cls, request=None, queryset=None):
         """
         Returns the active users products
         """
-        active_users_set = set()
-        activists = User.get_active_users()
-        for activist in activists:
-            active_users_set.add(activist.id)
+        if queryset is None:
+            queryset = cls.objects.all()
+        active_users = {obj.id for obj in User.objects.filter(is_active=True)}
+        return queryset.filter(user_id__in=active_users)
 
-        return cls.objects.filter(user_id__in=active_users_set)
+        # return cls.objects.filter(user__is_active=True)
 
     @admin.display(description='avatar')
     def display_avatar(self):
