@@ -61,11 +61,11 @@ class FileSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(queryset=User.objects.all(), slug_field='username')
-    # categories = CategorySerializer(many=True)
-    categories = serializers.HyperlinkedRelatedField(many=True, queryset=Category.objects.all(),
-                                                     view_name='category-detail')
-    # files = FileSerializer(many=True)
-    files = serializers.HyperlinkedRelatedField(many=True, queryset=File.objects.all(), view_name='file-detail')
+    categories = CategorySerializer(many=True)
+    # categories = serializers.HyperlinkedRelatedField(many=True, queryset=Category.objects.all(),
+    #                                                  view_name='category-detail')
+    files = FileSerializer(many=True)
+    # files = serializers.HyperlinkedRelatedField(many=True, queryset=File.objects.all(), view_name='file-detail')
 
     class Meta:
         model = Product
