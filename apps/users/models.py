@@ -1,4 +1,3 @@
-import random
 import uuid
 
 from django.db import models
@@ -6,8 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core import validators
 from django.utils import timezone
 from django.utils.html import format_html
-from django.contrib.auth.models import (AbstractBaseUser, PermissionsMixin, BaseUserManager, send_mail, AbstractUser,
-                                        UserManager)
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, send_mail, UserManager
 from django.contrib import admin
 
 from thumbnails.fields import ImageField
@@ -94,7 +92,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     nick_name = models.CharField(_('nick name'), max_length=150, blank=True)
     gender = models.BooleanField(_('gender'), help_text=_('female is No, male is Yes, Unknown is unset'), null=True,
                                  blank=True)
-    test_field = models.CharField(blank=True, null=True, max_length=100, verbose_name=_('test_field'))
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     last_seen = models.DateTimeField(_('last seen date'), null=True)
 
