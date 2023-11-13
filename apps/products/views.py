@@ -9,6 +9,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all().order_by('-created_time')
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post"]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -18,18 +19,21 @@ class ActiveProductList(viewsets.ReadOnlyModelViewSet):
     queryset = Product.get_active_users_products().order_by('-created_time')
     serializer_class = ProductSerializer
     permission_classes = [IsAdminUser]
+    http_method_names = ["get"]
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all().order_by('-created_time')
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post"]
 
 
 class FileViewSet(viewsets.ModelViewSet):
     queryset = File.objects.all().order_by('-created_time')
     serializer_class = FileSerializer
     permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post"]
 
 
 # class CategoryListView(APIView):
