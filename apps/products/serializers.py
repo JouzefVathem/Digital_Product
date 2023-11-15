@@ -10,7 +10,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('id', 'parent', 'title', 'description', 'avatar', 'url', 'is_enable')
+        fields = ('id', 'parent', 'title', 'description', 'avatar', 'avatar_thumbnails', 'url', 'is_enable')
 
     def create(self, validated_data):
         parent = validated_data.pop('parent')
@@ -69,7 +69,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'title', 'user', 'description', 'avatar', 'categories', 'files', 'url', 'is_enable')
+        fields = ('id', 'title', 'user', 'description', 'avatar', 'avatar_thumbnails',
+                  'categories', 'files', 'url', 'is_enable')
 
     def create(self, validated_data):
         user = validated_data.pop('user')
