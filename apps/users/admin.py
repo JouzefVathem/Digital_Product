@@ -60,12 +60,13 @@ class MyUserAdmin(ImportExportModelAdmin, UserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         (_('Personal Info'), {'fields': (('first_name', 'last_name'), 'gender', 'phone_number', 'email')}),
-        (_('Profile'), {'fields': ('nick_name', 'avatar')}),
+        (_('Profile'), {'classes': ('collapse',), 'fields': ('nick_name', 'avatar'), 'description': _('Set Your Profile')}),
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         (_('Important Dates'), {'fields': ('date_joined', 'last_login')}),
     )
     add_fieldsets = (
         (None, {'classes': ('wide',), 'fields': ('username', 'phone_number', 'password1', 'password2'), }),
+        (_('Profile'), {'classes': ('collapse',), 'fields': ('nick_name', 'avatar')}),
     )
     list_display = ('id', 'username', 'nick_name', 'gender', 'display_avatar', 'phone_number', 'email',
                     'is_staff', 'is_active', 'date_joined', 'last_seen')
