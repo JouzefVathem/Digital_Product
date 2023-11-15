@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'admin_auto_filters',
 
     'rest_framework',
     'rest_framework_simplejwt',
@@ -156,7 +157,7 @@ THUMBNAILS = {
         'watermarked': {
             'PROCESSORS': [
                 {'PATH': 'thumbnails.processors.resize', 'width': 20, 'height': 20},
-                # Only supports PNG. File must be of the same size with thumbnail (20 x 20 in this case)
+                # Only supports PNG. The File must be of the same size with thumbnail (20 x 20 in this case)
                 {'PATH': 'thumbnails.processors.add_watermark', 'watermark_path': 'watermark.png'}
             ],
         }
