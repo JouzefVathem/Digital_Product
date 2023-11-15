@@ -22,6 +22,14 @@ class Category(models.Model):
         verbose_name = _('Category')
         verbose_name_plural = _('Categories')
 
+    @property
+    def avatar_thumbnails(self):
+        try:
+            return f'http://127.0.0.1:8000/{self.avatar.thumbnails.small.url}'
+
+        except ValueError:
+            return '⚠️ avatar not set !!!'
+
     @admin.display(description='avatar')
     def display_avatar(self):
         try:
@@ -63,6 +71,14 @@ class Product(models.Model):
         db_table = 'products'
         verbose_name = _('product')
         verbose_name_plural = _('Products')
+
+    @property
+    def avatar_thumbnails(self):
+        try:
+            return f'http://127.0.0.1:8000/{self.avatar.thumbnails.small.url}'
+
+        except ValueError:
+            return '⚠️ avatar not set !!!'
 
     @classmethod
     def get_active_users_products(cls, request=None, queryset=None):
