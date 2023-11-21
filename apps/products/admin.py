@@ -5,7 +5,26 @@ from django.utils.translation import gettext_lazy as _
 
 from import_export.admin import ImportExportModelAdmin
 
+from admin_auto_filters.filters import AutocompleteFilter
+
 from .models import Category, Product, File
+
+
+class UserFilter(AutocompleteFilter):
+    title = 'User'
+    field_name = 'user'
+
+
+class CategoryFilter(AutocompleteFilter):
+    title = 'Category'
+    field_name = 'categories'
+
+
+class IsEnableFilter(AutocompleteFilter):
+    title = 'Is_enable'
+    field_name = 'is_enable'
+    parameter_name = 'is_enable'
+    rel_model = Product
 
 
 @admin.register(Category)
@@ -22,7 +41,7 @@ class CategoryAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_select_related = ('parent',)
     list_filter = ('parent', 'is_enable')
     list_per_page = 15
-    search_fields = ('id', 'title', 'parent')
+    search_fields = ('id', 'title', 'parent__title')
     search_help_text = _('Search by id, name or parent')
     date_hierarchy = 'updated_time'
     actions = ('make_enable', 'make_disable')
@@ -59,17 +78,17 @@ class ProductAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     inlines = (FileInlineAdmin,)
     fieldsets = (
         (None, {'classes': ('wide',), 'fields': ('title', 'user', 'is_enable', 'categories')}),
-        (_('Optional info'), {'classes': ('wide',), 'fields': ('description', 'avatar')}),
+        (_('Optional info'), {'classes': ('collapse',), 'fields': ('description', 'avatar')}),
         (_('Important Dates'), {'fields': ('created_time', 'updated_time')}),
     )
     filter_horizontal = ('categories',)
     list_display = ('id', 'title', 'user', 'display_avatar', 'is_enable', 'created_time', 'updated_time')
     list_display_links = ('id', 'title')
     list_select_related = ('user',)
-    list_filter = ('is_enable',)
+    list_filter = (UserFilter, CategoryFilter, 'is_enable')  # !!! Note : The "IsEnableFilter" causes an error.
     list_per_page = 15
     ordering = ('id',)
-    search_fields = ('id', 'title', 'user')
+    search_fields = ('id', 'title', 'user__username', 'user__first_name', 'user__last_name', 'is_enable')
     date_hierarchy = 'updated_time'
     actions = ('make_enable', 'make_disable')
     search_help_text = _('Search by id, title or user')
