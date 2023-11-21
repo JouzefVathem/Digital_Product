@@ -20,13 +20,6 @@ class CategoryFilter(AutocompleteFilter):
     field_name = 'categories'
 
 
-class IsEnableFilter(AutocompleteFilter):
-    title = 'Is_enable'
-    field_name = 'is_enable'
-    parameter_name = 'is_enable'
-    rel_model = Product
-
-
 @admin.register(Category)
 class CategoryAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     readonly_fields = ('created_time', 'updated_time')
@@ -85,7 +78,7 @@ class ProductAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('id', 'title', 'user', 'display_avatar', 'is_enable', 'created_time', 'updated_time')
     list_display_links = ('id', 'title')
     list_select_related = ('user',)
-    list_filter = (UserFilter, CategoryFilter, 'is_enable')  # !!! Note : The "IsEnableFilter" causes an error.
+    list_filter = (CategoryFilter, UserFilter, 'is_enable')
     list_per_page = 15
     ordering = ('id',)
     search_fields = ('id', 'title', 'user__username', 'user__first_name', 'user__last_name', 'is_enable')
