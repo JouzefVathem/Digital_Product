@@ -66,7 +66,7 @@ class FileInlineAdmin(admin.StackedInline):
 
 
 @admin.register(Product)
-class ProductAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class ProductAdmin(admin.ModelAdmin):  # ImportExportModelAdmin,
     readonly_fields = ('created_time', 'updated_time')
     inlines = (FileInlineAdmin,)
     fieldsets = (
