@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "django-projects"
+name = "Digital_Product"
 version = "0.1.0"
 description = ""
 authors = ["Seyed Reza Ahmadi <ahmadi_sr@yaftyar.ir>"]
@@ -12,7 +12,6 @@ django = "4.2"
 djangorestframework = "^3.14.0"
 djangorestframework-simplejwt = "^5.3.0"
 pillow = "^10.0.1"
-psycopg2 = "^2.9.8"
 psycopg2-binary = "^2.9.8"
 requests = "^2.31.0"
 django-import-export = "^3.3.1"
